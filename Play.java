@@ -13,15 +13,19 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
-import java.security.SecureRandom;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchProviderException;
-import java.security.KeyPair;
-import java.security.PublicKey;
-import java.security.PrivateKey;
+import java.io.*;
+// import java.security.SecureRandom;
+// import java.security.KeyPairGenerator;
+// import java.security.NoSuchProviderException;
+// import java.security.KeyPair;
+// import java.security.PublicKey;
+// import java.security.PrivateKey;
+// import java.security.Signature;
+
+import java.security.*;
 
 public class Play {
-    public static void main(String[] args){
+    public static void main(String[] args) throws InvalidKeyException{
         try{
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             byte[] hash = sha.digest();
@@ -33,7 +37,7 @@ public class Play {
         try{
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");// RSA, DSA,
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-            keyGen.initialize(2048, random);
+            keyGen.initialize(1024, random);
             System.out.println("Keygen made");
             
             KeyPair pair = keyGen.generateKeyPair();
@@ -42,24 +46,58 @@ public class Play {
             PublicKey pub2 = pair.getPublic();
             
             byte[] encodedPublic = pub.getEncoded();
-            System.out.println("Public 1: " + encodedPublic.toString());
-
-            byte[] encodedPublic2 = pub.getEncoded();
-            System.out.println("Public 2: " + encodedPublic2.toString());
-
+            System.out.println("Public 1: " + encodedPublic.toString());            
             
             byte[] encodedPrivate = priv.getEncoded();
             System.out.println("Private 1: " + encodedPrivate.toString());
-
-            byte[] encodedPrivate2 = pub2.getEncoded();
-            System.out.println("Private 2: " + encodedPrivate2.toString());
             
+            Signature dsa = Signature.getInstance("SHA1withDSA", "SUN"); 
+            dsa.initSign(priv);
+            
+            String path = "/Users/ced/Documents/uottawa/csi/4139_17/labs/01_encryption/file";
+            FileInputStream fis = new FileInputStream(path);
+            BufferedInputStream bufin = new BufferedInputStream(fis);
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = bufin.read(buffer)) >= 0) {
+                dsa.update(buffer, 0, len);
+            };
+            bufin.close();  
+            
+            byte[] realSig = dsa.sign();
+            System.out.println(realSig.toString());
+            
+            /* save the signature in a file */
+            String pth = "/Users/ced/Documents/uottawa/csi/4139_17/labs/01_encryption/";
+            FileOutputStream sigfos = new FileOutputStream(pth + "sue.signature");
+            sigfos.write(realSig);
+            sigfos.close();
+            
+            /* save the public key in a file */
+            byte[] key = pub.getEncoded();
+            FileOutputStream keyfos = new FileOutputStream(pth + "sue.publicKey");
+            keyfos.write(key);
+            keyfos.close();
+
+            byte[] keyPriv = priv.getEncoded();
+            FileOutputStream keyfos2 = new FileOutputStream(pth + "sue.privateKey");
+            keyfos2.write(keyPriv);
+            keyfos2.close();
                         
         } catch(NoSuchAlgorithmException e){
             System.out.println("Caught2");            
         } catch(NoSuchProviderException e){
             System.out.println("No Provider");
-        }
+        } catch(InvalidKeyException e){
+            System.out.println("Invalid Key");
+            throw e;
+        } catch(FileNotFoundException e){
+            System.out.println("File Not Found");
+        } catch(IOException e){
+            System.out.println("No Provider");
+        } catch(SignatureException e){
+            System.out.println("Signature Exception");
+        } 
         // byte[] publicKey = keyGen.genKeyPair().getPublic().getEncoded();
         // StringBuffer retString = new StringBuffer();
         // for (int i = 0; i < publicKey.length; ++i) {
