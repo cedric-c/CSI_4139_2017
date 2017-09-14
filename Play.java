@@ -12,6 +12,14 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
+
+import java.security.SecureRandom;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchProviderException;
+import java.security.KeyPair;
+import java.security.PublicKey;
+import java.security.PrivateKey;
+
 public class Play {
     public static void main(String[] args){
         try{
@@ -19,41 +27,49 @@ public class Play {
             byte[] hash = sha.digest();
             
         } catch(NoSuchAlgorithmException e){
-            System.out.println("Caught");
+            System.out.println("Caught1");
         }
-        String str = "Your string";
-        byte[] array = str.getBytes();
-        System.out.println("encrypted string:" + DatatypeConverter.printBase64Binary(array));
         
-        String out = Play.toBase64("Hello World");
-        System.out.println(out);
+        try{
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");// RSA, DSA,
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+            keyGen.initialize(2048, random);
+            System.out.println("Keygen made");
+            
+            KeyPair pair = keyGen.generateKeyPair();
+            PrivateKey priv = pair.getPrivate();
+            PublicKey pub = pair.getPublic();
+            
+                        
+        } catch(NoSuchAlgorithmException e){
+            System.out.println("Caught2");            
+        } catch(NoSuchProviderException e){
+            System.out.println("No Provider");
+        }
+        // byte[] publicKey = keyGen.genKeyPair().getPublic().getEncoded();
+        // StringBuffer retString = new StringBuffer();
+        // for (int i = 0; i < publicKey.length; ++i) {
+            // retString.append(Integer.toHexString(0x0100 + (publicKey[i] & 0x00FF)).substring(1));
+        // }
+        // System.out.println(retString);        
         
-        String in = Play.fromBase64(out);
-        System.out.println(in);
-        
-        // byte[] original = cipher.doFinal(DatatypeConverter.parseBase64Binary(encrypted‌​));
-        System.out.println("Bonjour Pauline");
-        
-        byte[]   bytesEncoded = Base64.encodeBase64(str .getBytes());
-        System.out.println("ecncoded value is " + new String(bytesEncoded ));
+        // String in = Play.toBase64("Hello World");
+        // System.out.println(in);
+        // String b = DatatypeConverter.parseBase64Binary(in);
+        // System.out.println(b);
+        // String out = Play.fromBase64(in);
+        // System.out.println(out);
 
-        // Decode data on other side, by processing encoded data
-        byte[] valueDecoded= Base64.decodeBase64(bytesEncoded );
-        System.out.println("Decoded value is " + new String(valueDecoded));        
-        
-        // sha.update("i1");
-        // sha.update("i2");
-        // sha.update("i3");
     }
     
     public static String toBase64(String content){
-        byte[] encoded = Base64.encodeBase64(content.getBytes());
-        return new String(encoded);
+        byte[] array = content.getBytes();
+        return DatatypeConverter.printBase64Binary(array);
     }
     
     public static String fromBase64(String content){
-        byte[] array = content.getBytes();
-        byte[] decoded = Base64.decodeBase64(array);
-        return new String(decoded);
+        byte[] array = DatatypeConverter.parseBase64Binary(content);
+        String ret = array.toString();
+        return ret;
     }
 }
