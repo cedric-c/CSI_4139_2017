@@ -39,6 +39,20 @@ public class Play {
             KeyPair pair = keyGen.generateKeyPair();
             PrivateKey priv = pair.getPrivate();
             PublicKey pub = pair.getPublic();
+            PublicKey pub2 = pair.getPublic();
+            
+            byte[] encodedPublic = pub.getEncoded();
+            System.out.println("Public 1: " + encodedPublic.toString());
+
+            byte[] encodedPublic2 = pub.getEncoded();
+            System.out.println("Public 2: " + encodedPublic2.toString());
+
+            
+            byte[] encodedPrivate = priv.getEncoded();
+            System.out.println("Private 1: " + encodedPrivate.toString());
+
+            byte[] encodedPrivate2 = pub2.getEncoded();
+            System.out.println("Private 2: " + encodedPrivate2.toString());
             
                         
         } catch(NoSuchAlgorithmException e){
