@@ -12,6 +12,13 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
+import java.nio.file.Files;
+
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.BadPaddingException;
+
+import java.nio.file.Paths;
 
 import java.io.*;
 // import java.security.SecureRandom;
@@ -21,11 +28,13 @@ import java.io.*;
 // import java.security.PublicKey;
 // import java.security.PrivateKey;
 // import java.security.Signature;
+import javax.crypto.KeyGenerator;
+
 
 import java.security.*;
 
 public class Play {
-    public static void main(String[] args) throws InvalidKeyException{
+    public static void main(String[] args) throws InvalidKeyException, FileNotFoundException, BadPaddingException, NoSuchAlgorithmException{
         try{
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             byte[] hash = sha.digest();
@@ -78,14 +87,44 @@ public class Play {
             FileOutputStream keyfos = new FileOutputStream(pth + "sue.publicKey");
             keyfos.write(key);
             keyfos.close();
-
+            
+            /* save the private key in a file */
             byte[] keyPriv = priv.getEncoded();
             FileOutputStream keyfos2 = new FileOutputStream(pth + "sue.privateKey");
             keyfos2.write(keyPriv);
             keyfos2.close();
+            
+            
+            // Path encryptThisFile = new Path();
+            String fileInput = Files.readAllBytes(Paths.get(pth + "file")).toString();
+            // ENCRYPTION
+            // specify mode and padding instead of relying on defaults (use OAEP if available!)
+            String i1 = "DES/CFB8/NoPadding";       // no providers
+            String i2 = "DES/CBC/PKCS5Padding";     // no providers
+            String i3 = "DES/OFB32/PKCS5Padding";   // no providers
+            String i4 = "AES/CBC/PKCS5Padding";
+            
+            KeyGenerator gen = KeyGenerator.getInstance("AES");
+            gen.init(128);  // Key size
+            Key key1 = gen.generateKey();
+            
+            
+            Cipher encrypt=Cipher.getInstance(i4);
+            // init with the *public key*!
+            encrypt.init(Cipher.ENCRYPT_MODE, key1);
+            // encrypt with known character encoding, you should probably use hybrid cryptography instead 
+            byte[] encryptedMessage = encrypt.doFinal(fileInput.getBytes());
+            String encryptedFilePath = pth + "file.encrypted";
+            
+            FileOutputStream encryptedFOS = new FileOutputStream(encryptedFilePath);
+            encryptedFOS.write(encryptedMessage);
+            encryptedFOS.close();
+            
+
                         
         } catch(NoSuchAlgorithmException e){
-            System.out.println("Caught2");            
+            System.out.println("NoSuchAlgorithmException");            
+            throw e;
         } catch(NoSuchProviderException e){
             System.out.println("No Provider");
         } catch(InvalidKeyException e){
@@ -93,24 +132,16 @@ public class Play {
             throw e;
         } catch(FileNotFoundException e){
             System.out.println("File Not Found");
+            throw e;
         } catch(IOException e){
             System.out.println("No Provider");
         } catch(SignatureException e){
             System.out.println("Signature Exception");
-        } 
-        // byte[] publicKey = keyGen.genKeyPair().getPublic().getEncoded();
-        // StringBuffer retString = new StringBuffer();
-        // for (int i = 0; i < publicKey.length; ++i) {
-            // retString.append(Integer.toHexString(0x0100 + (publicKey[i] & 0x00FF)).substring(1));
-        // }
-        // System.out.println(retString);        
-        
-        // String in = Play.toBase64("Hello World");
-        // System.out.println(in);
-        // String b = DatatypeConverter.parseBase64Binary(in);
-        // System.out.println(b);
-        // String out = Play.fromBase64(in);
-        // System.out.println(out);
+        } catch(NoSuchPaddingException e){
+            System.out.println("Signature Exception");
+        } catch(IllegalBlockSizeException e){
+            System.out.println("Signature Exception");
+        }
 
     }
     
@@ -123,5 +154,16 @@ public class Play {
         byte[] array = DatatypeConverter.parseBase64Binary(content);
         String ret = array.toString();
         return ret;
+    }
+    
+    public static String readFile(String path) throws IOException, FileNotFoundException{
+        String content = Files.readAllBytes(Paths.get(path)).toString();
+        return content;
+    }
+    
+    public static void writeFile(String path, String content) throws IOException{
+        FileOutputStream fos = new FileOutputStream(path);
+        fos.write(content.getBytes());
+        fos.close();
     }
 }
