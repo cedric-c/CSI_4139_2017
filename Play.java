@@ -40,7 +40,7 @@ import javax.crypto.BadPaddingException;
 import java.security.SignatureException;
 
 public class Play {
-    private static int KEY_SIZE             = 1024;
+    private static int KEY_SIZE             = 2048;
     private static String ALICE_PUBLIC_KEY  = "Keypairs/alice_public"; // KeyPair/publicKey_Alice"
     private static String ALICE_PRIVATE_KEY = "Keypairs/alice_private"; // KeyPair/privateKey_Alice
     private static String BOB_PUBLIC_KEY    = "Keypairs/bob_public"; // KeyPair/publicKey_Bob
@@ -48,16 +48,16 @@ public class Play {
     private static String KEY_INSTANCE      = "RSA";
     
     // encryption key
-    private static int SYMMETRIC_KEY_LENGTH = 16;
-    private static String SECRET_KEY_SPEC_ALGO   = "AES";
-    private static String SECRET_KEY_PATH   = "SecretKeys/SecretSymKey"; // OneKey/secretKey
+    private static int    SECRET_LENGTH_BYTES       = 16; // 16, 24, 32
+    private static String SECRET_KEY_SPEC_ALGO      = "AES";
+    private static String SECRET_KEY_PATH           = "SecretKeys/SecretSymKey"; // OneKey/secretKey
     private static String SECRET_KEY_PATH_ENCRYPTED = "SecretKeys/SecretSymKeyEncrypted";
     private static String SECRET_KEY_PATH_DECRYPTED = "SecretKeys/SecretSymKeyDecrypted";
     
     // protectme
-    private static String PAYLOAD           = "UnprotectedFiles/love.txt";
-    private static String PAYLOAD_ENCRYPTED = "EncryptedFiles/love.txt";
-    private static String PAYLOAD_DECRYPTED = "DecryptedFiles/love.txt";
+    private static String PAYLOAD           = "UnprotectedFiles/photo.png";
+    private static String PAYLOAD_ENCRYPTED = "EncryptedFiles/photo.png";
+    private static String PAYLOAD_DECRYPTED = "DecryptedFiles/photo.png";
     
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, SignatureException{
         // SimpleIO.writeContent("files/file.txt", "Hello world 222");
@@ -77,7 +77,7 @@ public class Play {
         SimpleIO.writeContent(BOB_PRIVATE_KEY,   keys_bob.getPrivateKeyBytes());
         
         // generate symmetric keys
-        SymKeyGen secretKey = new SymKeyGen(SYMMETRIC_KEY_LENGTH, SECRET_KEY_SPEC_ALGO);
+        SymKeyGen secretKey = new SymKeyGen(SECRET_LENGTH_BYTES, SECRET_KEY_SPEC_ALGO);
         SimpleIO.writeContent(SECRET_KEY_PATH, secretKey.getKeyBytes());
         
         // generate symmetric key, public and private keys from files
@@ -117,6 +117,7 @@ public class Play {
         SimpleChecksum checksum_post = new SimpleChecksum(output,alicePrivateKey);
         // System.out.println("Checksum pre-encription: " + checksum_pre.toString());
         // System.out.println("Checksum post-encription: " + checksum_post.toString());
+        
     }
 
 }
