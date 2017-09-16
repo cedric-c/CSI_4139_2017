@@ -37,6 +37,8 @@ import java.security.*;
 import java.security.InvalidKeyException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.BadPaddingException;
+import java.security.SignatureException;
+
 public class Play {
     private static int KEY_SIZE             = 1024;
     private static String ALICE_PUBLIC_KEY  = "Keypairs/alice_public"; // KeyPair/publicKey_Alice"
@@ -53,11 +55,11 @@ public class Play {
     private static String SECRET_KEY_PATH_DECRYPTED = "SecretKeys/SecretSymKeyDecrypted";
     
     // protectme
-    private static String LOVE_LETTER           = "UnprotectedFiles/love.txt";
-    private static String LOVE_LETTER_ENCRYPTED = "EncryptedFiles/love.txt";
-    private static String LOVE_LETTER_DECRYPTED = "DecryptedFiles/love.txt";
+    private static String PAYLOAD           = "UnprotectedFiles/love.txt";
+    private static String PAYLOAD_ENCRYPTED = "EncryptedFiles/love.txt";
+    private static String PAYLOAD_DECRYPTED = "DecryptedFiles/love.txt";
     
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, SignatureException{
         // SimpleIO.writeContent("files/file.txt", "Hello world 222");
         // String contents = SimpleIO.readContent("files/file.txt");
         // System.out.println(contents);
@@ -98,9 +100,9 @@ public class Play {
         File            secretKeyFileEncrypted = new File(SECRET_KEY_PATH_ENCRYPTED);
         
         // create the encrypted file
-        File unprotected_file = new File(LOVE_LETTER);
-        File protected_file   = new File(LOVE_LETTER_ENCRYPTED);
-        File output           = new File(LOVE_LETTER_DECRYPTED);
+        File unprotected_file = new File(PAYLOAD);
+        File protected_file   = new File(PAYLOAD_ENCRYPTED);
+        File output           = new File(PAYLOAD_DECRYPTED);
         CryptManager.encryptKey(bobPublicKey, secretKeyFile, secretKeyFileEncrypted, KEY_INSTANCE);
         CryptManager.encryptData(unprotected_file, protected_file, secret, SECRET_KEY_SPEC_ALGO);
         
@@ -111,6 +113,10 @@ public class Play {
         CryptManager.decryptKey(bobPrivateKey, secretEncryptedFile, secretDecryptedFile, KEY_INSTANCE);
         CryptManager.decryptData(protected_file, output, secret, SECRET_KEY_SPEC_ALGO);
         
+        SimpleChecksum checksum_pre  = new SimpleChecksum(unprotected_file,alicePrivateKey);
+        SimpleChecksum checksum_post = new SimpleChecksum(output,alicePrivateKey);
+        // System.out.println("Checksum pre-encription: " + checksum_pre.toString());
+        // System.out.println("Checksum post-encription: " + checksum_post.toString());
     }
 
 }

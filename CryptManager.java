@@ -1,3 +1,6 @@
+/**
+ * Generates the key objects from java File objects or paths. Inspired by Marilena's work found at https://www.mkyong.com/java/java-hybrid-cryptography-example/.
+ */
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -15,9 +18,7 @@ import java.security.InvalidKeyException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.BadPaddingException;
-/**
- * Generates the key objects from java File objects or paths.
- */
+import java.security.Key;
 public class CryptManager{
     
     public static PrivateKey getPrivateKey(String filename, String algorithm) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
@@ -54,7 +55,7 @@ public class CryptManager{
      * @param SecretKeySpec secretKey 
      */
     public static void encryptKey(PublicKey pub, File keyFile, File encryptedKeyFile, String algorithm)  throws NoSuchAlgorithmException, InvalidKeyException, IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
-        
+        System.out.println("Encrypting key for file " +keyFile.getName());
         byte[] toEncrypt = SimpleIO.readBytes(keyFile);
         Cipher cipher = Cipher.getInstance(algorithm);
         cipher.init(Cipher.ENCRYPT_MODE, pub);
@@ -65,31 +66,30 @@ public class CryptManager{
      * Writes encrypted data from an unencrypted file to an encrypted file using a secret key spec and algorithm which was created with a call to `encryptKey`.
      */
     public static void encryptData(File unencrypted, File encrypted, SecretKeySpec secret, String algorithm) throws NoSuchAlgorithmException, InvalidKeyException, IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
-        
+        System.out.println("Encrypting data for file " + unencrypted.getName() + ". ");
         Cipher cipher = Cipher.getInstance(algorithm);
         byte[] unencryptedBytes = SimpleIO.readBytes(unencrypted);
         cipher.init(Cipher.ENCRYPT_MODE, secret);
         SimpleIO.writeBytes(encrypted, cipher.doFinal(unencryptedBytes));
-        
     }
     
-    public static void decryptKey(PrivateKey priv, File encryptedSecretKey, File decryptedSecretKey, String algorithm) throws NoSuchAlgorithmException, InvalidKeyException, IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
-        
+    public static void decryptKey(Key key, File encryptedSecretKey, File decryptedSecretKey, String algorithm) throws NoSuchAlgorithmException, InvalidKeyException, IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+        System.out.println("Decrypting key for file " +encryptedSecretKey.getName());
         Cipher cipher = Cipher.getInstance(algorithm);
-        cipher.init(Cipher.DECRYPT_MODE, priv);
+        cipher.init(Cipher.DECRYPT_MODE, key);
         
-        byte[] encryptedDecryptionKey = SimpleIO.readBytes(encryptedSecretKey);
+        byte[] encryptedDecryptionKey = SimpleIO.readBytes(encryptedSecretKey);        
         SimpleIO.writeBytes(decryptedSecretKey, cipher.doFinal(encryptedDecryptionKey));
-    
     }
     
     public static void decryptData(File encryptedFile, File decryptedFile, SecretKeySpec secret, String algorithm) throws NoSuchAlgorithmException, InvalidKeyException, IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+        
+        System.out.println("Decrypting data for file " +encryptedFile.getName());
         byte[] encryptedData = SimpleIO.readBytes(encryptedFile);
         Cipher cipher = Cipher.getInstance(algorithm);
         cipher.init(Cipher.DECRYPT_MODE, secret);
         byte[] decryptedData = cipher.doFinal(encryptedData);
         SimpleIO.writeBytes(decryptedFile, decryptedData);
-        
     }
     
     

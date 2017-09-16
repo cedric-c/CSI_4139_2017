@@ -84,6 +84,7 @@ public class SimpleIO{
 
 
     public static void writeBytes(File output, byte[] toWrite) throws IOException{
+        System.out.println("Writting "+ toWrite.length +" bytes to file " + output.getName() );
         FileOutputStream fos = new FileOutputStream(output);
         fos.write(toWrite);
         fos.flush();
@@ -101,10 +102,11 @@ public class SimpleIO{
     
     public static void writeBytes(String path, byte[] toWrite) throws IOException {
         File file = new File(path);
-        FileOutputStream fos = new FileOutputStream(file);
-        fos.write(toWrite);
-        fos.flush();
-        fos.close();
+        SimpleIO.writeBytes(file, toWrite);
+        // FileOutputStream fos = new FileOutputStream(file);
+        // fos.write(toWrite);
+        // fos.flush();
+        // fos.close();
     }
     
     public static void writeContent(String path, String content) throws IOException{
