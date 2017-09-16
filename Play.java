@@ -56,8 +56,8 @@ public class Play {
     
     // protectme
     private static String PAYLOAD           = "UnprotectedFiles/photo.png";
-    private static String PAYLOAD_ENCRYPTED = "EncryptedFiles/photo.png";
-    private static String PAYLOAD_DECRYPTED = "DecryptedFiles/photo.png";
+    private static String PAYLOAD_ENCRYPTED = "EncryptedFiles/photo_encrypted.png";
+    private static String PAYLOAD_DECRYPTED = "DecryptedFiles/photo_decrypted.png";
     
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, SignatureException{
         // SimpleIO.writeContent("files/file.txt", "Hello world 222");
@@ -112,12 +112,7 @@ public class Play {
         // SecretKeySpec decryptedSecret = CryptManager.getSecretKey(secretDecryptedFile, SECRET_KEY_SPEC_ALGO);
         CryptManager.decryptKey(bobPrivateKey, secretEncryptedFile, secretDecryptedFile, KEY_INSTANCE);
         CryptManager.decryptData(protected_file, output, secret, SECRET_KEY_SPEC_ALGO);
-        
-        SimpleChecksum checksum_pre  = new SimpleChecksum(unprotected_file,alicePrivateKey);
-        SimpleChecksum checksum_post = new SimpleChecksum(output,alicePrivateKey);
-        // System.out.println("Checksum pre-encription: " + checksum_pre.toString());
-        // System.out.println("Checksum post-encription: " + checksum_post.toString());
-        
+                
     }
 
 }
