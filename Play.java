@@ -50,6 +50,7 @@ public class Play {
     private static String SECRET_KEY_SPEC_ALGO   = "AES";
     private static String SECRET_KEY_PATH   = "SecretKeys/SecretSymKey"; // OneKey/secretKey
     private static String SECRET_KEY_PATH_ENCRYPTED = "SecretKeys/SecretSymKeyEncrypted";
+    private static String SECRET_KEY_PATH_DECRYPTED = "SecretKeys/SecretSymKeyDecrypted";
     
     // protectme
     private static String LOVE_LETTER           = "UnprotectedFiles/love.txt";
@@ -96,11 +97,19 @@ public class Play {
         SecretKeySpec   secret                 = CryptManager.getSecretKey(secretKeyFile, SECRET_KEY_SPEC_ALGO);
         File            secretKeyFileEncrypted = new File(SECRET_KEY_PATH_ENCRYPTED);
         
+        // create the encrypted file
         File unprotected_file = new File(LOVE_LETTER);
         File protected_file   = new File(LOVE_LETTER_ENCRYPTED);
+        File output           = new File(LOVE_LETTER_DECRYPTED);
         CryptManager.encryptKey(bobPublicKey, secretKeyFile, secretKeyFileEncrypted, KEY_INSTANCE);
         CryptManager.encryptData(unprotected_file, protected_file, secret, SECRET_KEY_SPEC_ALGO);
         
+        // create the decryption secret
+        File secretEncryptedFile = new File(SECRET_KEY_PATH_ENCRYPTED);
+        File secretDecryptedFile = new File(SECRET_KEY_PATH_DECRYPTED);
+        // SecretKeySpec decryptedSecret = CryptManager.getSecretKey(secretDecryptedFile, SECRET_KEY_SPEC_ALGO);
+        CryptManager.decryptKey(bobPrivateKey, secretEncryptedFile, secretDecryptedFile, KEY_INSTANCE);
+        CryptManager.decryptData(protected_file, output, secret, SECRET_KEY_SPEC_ALGO);
         
     }
 

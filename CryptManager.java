@@ -48,6 +48,7 @@ public class CryptManager{
     }
     
     /**
+     * Creates an encrypted key spec provided a public key, unencrypted key file and algorithm.
      * @param byte[]        toEncrypt 
      * @param File          output    
      * @param SecretKeySpec secretKey 
@@ -60,27 +61,34 @@ public class CryptManager{
         SimpleIO.writeBytes(encryptedKeyFile, cipher.doFinal(toEncrypt));
     }
     
+    /**
+     * Writes encrypted data from an unencrypted file to an encrypted file using a secret key spec and algorithm which was created with a call to `encryptKey`.
+     */
     public static void encryptData(File unencrypted, File encrypted, SecretKeySpec secret, String algorithm) throws NoSuchAlgorithmException, InvalidKeyException, IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
-        // File originalFile = new File("confidential.txt");
-        // File encryptedFile = new File("EncryptedFiles/encryptedFile");
-        // new EncryptData(originalFile, encryptedFile, startEnc.getSecretKey("OneKey/secretKey", "AES"), "AES");{
-        //             public EncryptData(File originalFile, File encrypted, SecretKeySpec secretKey, String cipherAlgorithm) throws IOException, GeneralSecurityException{
-        //                 this.cipher = Cipher.getInstance(cipherAlgorithm);      
-        //                 encryptFile(getFileInBytes(originalFile), encrypted, secretKey);
-        //             }
-                    
-        //             public void encryptFile(byte[] input, File output, SecretKeySpec key) throws IOException, GeneralSecurityException {
-        //                 this.cipher.init(Cipher.ENCRYPT_MODE, key);
-        //                 writeToFile(output, this.cipher.doFinal(input));
-        //             }                
-        // }
-        
-        // passes unencrypted, encrypted, SecretKeySpec, and Cipher Algo
         
         Cipher cipher = Cipher.getInstance(algorithm);
         byte[] unencryptedBytes = SimpleIO.readBytes(unencrypted);
         cipher.init(Cipher.ENCRYPT_MODE, secret);
         SimpleIO.writeBytes(encrypted, cipher.doFinal(unencryptedBytes));
+        
+    }
+    
+    public static void decryptKey(PrivateKey priv, File encryptedSecretKey, File decryptedSecretKey, String algorithm) throws NoSuchAlgorithmException, InvalidKeyException, IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+        
+        Cipher cipher = Cipher.getInstance(algorithm);
+        cipher.init(Cipher.DECRYPT_MODE, priv);
+        
+        byte[] encryptedDecryptionKey = SimpleIO.readBytes(encryptedSecretKey);
+        SimpleIO.writeBytes(decryptedSecretKey, cipher.doFinal(encryptedDecryptionKey));
+    
+    }
+    
+    public static void decryptData(File encryptedFile, File decryptedFile, SecretKeySpec secret, String algorithm) throws NoSuchAlgorithmException, InvalidKeyException, IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException{
+        byte[] encryptedData = SimpleIO.readBytes(encryptedFile);
+        Cipher cipher = Cipher.getInstance(algorithm);
+        cipher.init(Cipher.DECRYPT_MODE, secret);
+        byte[] decryptedData = cipher.doFinal(encryptedData);
+        SimpleIO.writeBytes(decryptedFile, decryptedData);
         
     }
     
