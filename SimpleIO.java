@@ -84,12 +84,12 @@ public class SimpleIO{
 
 
     public static void writeBytes(File output, byte[] toWrite) throws IOException{
-        output.getParentFile().mkdirs();
         FileOutputStream fos = new FileOutputStream(output);
         fos.write(toWrite);
         fos.flush();
         fos.close();
     }
+    
     
     public static byte[] readBytes(File f) throws IOException{
         FileInputStream fis = new FileInputStream(f);
@@ -99,9 +99,30 @@ public class SimpleIO{
         return fbytes;
     }
     
+    public static void writeBytes(String path, byte[] toWrite) throws IOException {
+        File file = new File(path);
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(toWrite);
+        fos.flush();
+        fos.close();
+    }
+    
     public static void writeContent(String path, String content) throws IOException{
         File file = new File(path);
         SimpleIO.writeBytes(file, content.getBytes());
+    }
+    public static byte[] readBytes(String path) throws IOException{
+        File file = new File(path);
+        FileInputStream fis = new FileInputStream(file);
+        byte[] fbytes = new byte[(int) file.length()];
+        fis.read(fbytes);
+        fis.close();
+        return fbytes;
+    }
+    
+    public static void writeContent(String path, byte[] toWrite) throws IOException{
+        File file = new File(path);
+        SimpleIO.writeBytes(file, toWrite);
     }
     
     public static String readContent(String path) throws IOException{

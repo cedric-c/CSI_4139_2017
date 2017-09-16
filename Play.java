@@ -12,11 +12,11 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
-import java.nio.file.Files;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.BadPaddingException;
+import java.nio.file.Files;
 
 import java.nio.file.Paths;
 
@@ -29,141 +29,79 @@ import java.io.*;
 // import java.security.PrivateKey;
 // import java.security.Signature;
 import javax.crypto.KeyGenerator;
-
-
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.spec.InvalidKeySpecException;
 import java.security.*;
-
+import java.security.InvalidKeyException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.BadPaddingException;
 public class Play {
-    public static void main(String[] args) throws InvalidKeyException, FileNotFoundException, BadPaddingException, NoSuchAlgorithmException{
-        try{
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            byte[] hash = sha.digest();
-            
-        } catch(NoSuchAlgorithmException e){
-            System.out.println("Caught1");
-        }
+    private static int KEY_SIZE             = 1024;
+    private static String ALICE_PUBLIC_KEY  = "Keypairs/alice_public"; // KeyPair/publicKey_Alice"
+    private static String ALICE_PRIVATE_KEY = "Keypairs/alice_private"; // KeyPair/privateKey_Alice
+    private static String BOB_PUBLIC_KEY    = "Keypairs/bob_public"; // KeyPair/publicKey_Bob
+    private static String BOB_PRIVATE_KEY   = "Keypairs/bob_private"; // KeyPair/privateKey_Bob
+    private static String KEY_INSTANCE      = "RSA";
+    
+    // encryption key
+    private static int SYMMETRIC_KEY_LENGTH = 16;
+    private static String SECRET_KEY_SPEC_ALGO   = "AES";
+    private static String SECRET_KEY_PATH   = "SecretKeys/SecretSymKey"; // OneKey/secretKey
+    private static String SECRET_KEY_PATH_ENCRYPTED = "SecretKeys/SecretSymKeyEncrypted";
+    
+    // protectme
+    private static String LOVE_LETTER           = "UnprotectedFiles/love.txt";
+    private static String LOVE_LETTER_ENCRYPTED = "EncryptedFiles/love.txt";
+    private static String LOVE_LETTER_DECRYPTED = "DecryptedFiles/love.txt";
+    
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
+        // SimpleIO.writeContent("files/file.txt", "Hello world 222");
+        // String contents = SimpleIO.readContent("files/file.txt");
+        // System.out.println(contents);
         
-        try{
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");// RSA, DSA,
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-            keyGen.initialize(1024, random);
-            System.out.println("Keygen made");
-            
-            KeyPair pair = keyGen.generateKeyPair();
-            PrivateKey priv = pair.getPrivate();
-            PublicKey pub = pair.getPublic();
-            PublicKey pub2 = pair.getPublic();
-            
-            byte[] encodedPublic = pub.getEncoded();
-            System.out.println("Public 1: " + encodedPublic.toString());            
-            
-            byte[] encodedPrivate = priv.getEncoded();
-            System.out.println("Private 1: " + encodedPrivate.toString());
-            
-            Signature dsa = Signature.getInstance("SHA1withDSA", "SUN"); 
-            dsa.initSign(priv);
-            
-            String path = "/Users/ced/Documents/uottawa/csi/4139_17/labs/01_encryption/file";
-            FileInputStream fis = new FileInputStream(path);
-            BufferedInputStream bufin = new BufferedInputStream(fis);
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = bufin.read(buffer)) >= 0) {
-                dsa.update(buffer, 0, len);
-            };
-            bufin.close();  
-            
-            byte[] realSig = dsa.sign();
-            System.out.println(realSig.toString());
-            
-            /* save the signature in a file */
-            String pth = "/Users/ced/Documents/uottawa/csi/4139_17/labs/01_encryption/";
-            FileOutputStream sigfos = new FileOutputStream(pth + "sue.signature");
-            sigfos.write(realSig);
-            sigfos.close();
-            
-            /* save the public key in a file */
-            byte[] key = pub.getEncoded();
-            FileOutputStream keyfos = new FileOutputStream(pth + "sue.publicKey");
-            keyfos.write(key);
-            keyfos.close();
-            
-            /* save the private key in a file */
-            byte[] keyPriv = priv.getEncoded();
-            FileOutputStream keyfos2 = new FileOutputStream(pth + "sue.privateKey");
-            keyfos2.write(keyPriv);
-            keyfos2.close();
-            
-            
-            // Path encryptThisFile = new Path();
-            String fileInput = Files.readAllBytes(Paths.get(pth + "file")).toString();
-            // ENCRYPTION
-            // specify mode and padding instead of relying on defaults (use OAEP if available!)
-            String i1 = "DES/CFB8/NoPadding";       // no providers
-            String i2 = "DES/CBC/PKCS5Padding";     // no providers
-            String i3 = "DES/OFB32/PKCS5Padding";   // no providers
-            String i4 = "AES/CBC/PKCS5Padding";
-            
-            KeyGenerator gen = KeyGenerator.getInstance("AES");
-            gen.init(128);  // Key size
-            Key key1 = gen.generateKey();
-            
-            
-            Cipher encrypt=Cipher.getInstance(i4);
-            // init with the *public key*!
-            encrypt.init(Cipher.ENCRYPT_MODE, key1);
-            // encrypt with known character encoding, you should probably use hybrid cryptography instead 
-            byte[] encryptedMessage = encrypt.doFinal(fileInput.getBytes());
-            String encryptedFilePath = pth + "file.encrypted";
-            
-            FileOutputStream encryptedFOS = new FileOutputStream(encryptedFilePath);
-            encryptedFOS.write(encryptedMessage);
-            encryptedFOS.close();
-            
+        // create keys 
+        KeyGen keys_alice = new KeyGen(KEY_SIZE, KEY_INSTANCE);
+        KeyGen keys_bob   = new KeyGen(KEY_SIZE, KEY_INSTANCE);
+        keys_alice.createKeys();
+        keys_bob.createKeys();
+        
+        // write the keys to files
+        SimpleIO.writeContent(ALICE_PUBLIC_KEY,  keys_alice.getPublicKeyBytes());
+        SimpleIO.writeContent(ALICE_PRIVATE_KEY, keys_alice.getPrivateKeyBytes());
+        SimpleIO.writeContent(BOB_PUBLIC_KEY,    keys_bob.getPublicKeyBytes());
+        SimpleIO.writeContent(BOB_PRIVATE_KEY,   keys_bob.getPrivateKeyBytes());
+        
+        // generate symmetric keys
+        SymKeyGen secretKey = new SymKeyGen(SYMMETRIC_KEY_LENGTH, SECRET_KEY_SPEC_ALGO);
+        SimpleIO.writeContent(SECRET_KEY_PATH, secretKey.getKeyBytes());
+        
+        // generate symmetric key, public and private keys from files
+        
+        PrivateKey bobPrivateKey  = CryptManager.getPrivateKey(BOB_PRIVATE_KEY, KEY_INSTANCE);
+        PublicKey  bobPublicKey  = CryptManager.getPublicKey(BOB_PUBLIC_KEY, KEY_INSTANCE);
+        File       bobPrivateKeyFile = new File(BOB_PRIVATE_KEY);
+        File       bobPublicKeyFile  = new File(BOB_PUBLIC_KEY);
+        
+        PrivateKey alicePrivateKey  = CryptManager.getPrivateKey(ALICE_PRIVATE_KEY, KEY_INSTANCE);
+        PublicKey  alicePublicKey  = CryptManager.getPublicKey(ALICE_PUBLIC_KEY, KEY_INSTANCE);
+        File       alicePrivateKeyFile = new File(ALICE_PRIVATE_KEY);
+        File       alicePublicKeyFile  = new File(ALICE_PUBLIC_KEY);
+        
+        
+        // StartEncryption startEnc = new StartEncryption();
 
-                        
-        } catch(NoSuchAlgorithmException e){
-            System.out.println("NoSuchAlgorithmException");            
-            throw e;
-        } catch(NoSuchProviderException e){
-            System.out.println("No Provider");
-        } catch(InvalidKeyException e){
-            System.out.println("Invalid Key");
-            throw e;
-        } catch(FileNotFoundException e){
-            System.out.println("File Not Found");
-            throw e;
-        } catch(IOException e){
-            System.out.println("No Provider");
-        } catch(SignatureException e){
-            System.out.println("Signature Exception");
-        } catch(NoSuchPaddingException e){
-            System.out.println("Signature Exception");
-        } catch(IllegalBlockSizeException e){
-            System.out.println("Signature Exception");
-        }
+        File            secretKeyFile          = new File(SECRET_KEY_PATH);
+        SecretKeySpec   secret                 = CryptManager.getSecretKey(secretKeyFile, SECRET_KEY_SPEC_ALGO);
+        File            secretKeyFileEncrypted = new File(SECRET_KEY_PATH_ENCRYPTED);
+        
+        File unprotected_file = new File(LOVE_LETTER);
+        File protected_file   = new File(LOVE_LETTER_ENCRYPTED);
+        CryptManager.encryptKey(bobPublicKey, secretKeyFile, secretKeyFileEncrypted, KEY_INSTANCE);
+        CryptManager.encryptData(unprotected_file, protected_file, secret, SECRET_KEY_SPEC_ALGO);
+        
+        
+    }
 
-    }
-    
-    public static String toBase64(String content){
-        byte[] array = content.getBytes();
-        return DatatypeConverter.printBase64Binary(array);
-    }
-    
-    public static String fromBase64(String content){
-        byte[] array = DatatypeConverter.parseBase64Binary(content);
-        String ret = array.toString();
-        return ret;
-    }
-    
-    public static String readFile(String path) throws IOException, FileNotFoundException{
-        String content = Files.readAllBytes(Paths.get(path)).toString();
-        return content;
-    }
-    
-    public static void writeFile(String path, String content) throws IOException{
-        FileOutputStream fos = new FileOutputStream(path);
-        fos.write(content.getBytes());
-        fos.close();
-    }
 }
