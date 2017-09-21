@@ -1,3 +1,9 @@
+/*
+ * @author <cclem054@uottawa.ca>
+ * @version 1.0
+ * @since September 21, 2017
+ * (c) Copyright 2017 Cédric Clément.
+ */
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import javax.xml.bind.DatatypeConverter;

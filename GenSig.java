@@ -34,7 +34,7 @@ import java.io.*;
 import java.security.*;
 
 class GenSig {
-
+    
     public static void main(String[] args) {
 
         /* Generate a DSA signature */
@@ -48,7 +48,7 @@ class GenSig {
 
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "SUN");
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-
+            
             keyGen.initialize(1024, random);
 
             KeyPair pair = keyGen.generateKeyPair();
@@ -84,7 +84,7 @@ class GenSig {
             /* Save the signature in a file */
             FileOutputStream sigfos = new FileOutputStream(sigFilePath + "_sig");
             sigfos.write(realSig);
-
+            
             sigfos.close();
 
 
@@ -97,6 +97,7 @@ class GenSig {
 
         } catch (Exception e) {
             System.err.println("Caught exception " + e.toString());
+            // source.java meta.class.java meta.class.body.java meta.method.java meta.method.body.java keyword.operator.dereference.java
         }
 
     };

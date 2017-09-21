@@ -1,3 +1,9 @@
+/*
+ * @author <cclem054@uottawa.ca>
+ * @version 1.0
+ * @since September 21, 2017
+ * (c) Copyright 2017 Cédric Clément.
+ */
 /**
  * @todo (1) Generate 2 public-key / private-key pairs, one for encryption/decryption and one for signing/verifying. 
  * @todo Take a file as input and call the appropriate routines to hash and sign it, and also to encrypt it with a symmetric key and then encrypt the symmetric key with the public key of a recipient.
@@ -63,7 +69,7 @@ public class Play {
         // SimpleIO.writeContent("files/file.txt", "Hello world 222");
         // String contents = SimpleIO.readContent("files/file.txt");
         // System.out.println(contents);
-        
+
         // create keys 
         KeyGen keys_alice = new KeyGen(KEY_SIZE, KEY_INSTANCE);
         KeyGen keys_bob   = new KeyGen(KEY_SIZE, KEY_INSTANCE);

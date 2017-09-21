@@ -1,3 +1,9 @@
+/*
+ * @author <cclem054@uottawa.ca>
+ * @version 1.0
+ * @since September 21, 2017
+ * (c) Copyright 2017 Cédric Clément.
+ */
 /**
  * Generates the key objects from java File objects or paths. Inspired by Marilena's work found at https://www.mkyong.com/java/java-hybrid-cryptography-example/.
  */

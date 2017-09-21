@@ -1,4 +1,10 @@
-// https://www.mkyong.com/java/java-hybrid-cryptography-example/
+/*
+ * @author <cclem054@uottawa.ca>
+ * @version 1.0
+ * @since September 21, 2017
+ * @see https://www.mkyong.com/java/java-hybrid-cryptography-example/
+ * (c) Copyright 2017 Cédric Clément.
+ */
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
