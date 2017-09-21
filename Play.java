@@ -27,13 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import java.io.*;
-// import java.security.SecureRandom;
-// import java.security.KeyPairGenerator;
-// import java.security.NoSuchProviderException;
-// import java.security.KeyPair;
-// import java.security.PublicKey;
-// import java.security.PrivateKey;
-// import java.security.Signature;
 import javax.crypto.KeyGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -66,9 +59,6 @@ public class Play {
     private static String PAYLOAD_DECRYPTED = "DecryptedFiles/photo_decrypted.png";
     
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, SignatureException{
-        // SimpleIO.writeContent("files/file.txt", "Hello world 222");
-        // String contents = SimpleIO.readContent("files/file.txt");
-        // System.out.println(contents);
 
         // create keys 
         KeyGen keys_alice = new KeyGen(KEY_SIZE, KEY_INSTANCE);
