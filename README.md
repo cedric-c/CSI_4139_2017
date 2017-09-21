@@ -1,3 +1,4 @@
-# CSI_4139_2017
+# CSI_4139_2017 
 
-https://docs.oracle.com/javase/tutorial/security/apisign/step3.html
+This repository contains the work completed for CSI 4139. READMEs will be made available after a laboratory is submitted for grading.
+
